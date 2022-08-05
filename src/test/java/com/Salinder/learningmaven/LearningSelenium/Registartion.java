@@ -55,14 +55,14 @@ public class Registartion {
 		String warningMessage = privacyWarning.getText();
 		System.out.println(warningMessage);
 
-		Assert.assertEquals(warningMessage, "Warning: You must agree to the Privacy Policy!", "Not mached");
+		Assert.assertEquals(warningMessage, "Warning: You must agree to the Privacy Policy!", "Not mached warning");
 
 	}
 
 	@AfterMethod
 	public void teardown() throws InterruptedException {
 
-		Thread.sleep(3000);
+		Thread.sleep(2000);
 		driver.close();
 	}
 
