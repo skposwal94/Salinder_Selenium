@@ -10,7 +10,10 @@ import org.openqa.selenium.By.ByCssSelector;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterTest;
@@ -31,7 +34,7 @@ public class RegistartionPurchaseLogout {
 
 		driver.manage().window().maximize();
 
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+//		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
 	}
 
@@ -79,6 +82,8 @@ public class RegistartionPurchaseLogout {
 	@Test(priority = 2, dependsOnMethods = "Registration", enabled = true)
 	public void purchasingAndCheckOut() throws InterruptedException {
 
+		WebDriverWait wait = new WebDriverWait(driver, 30);
+
 		// continue button after registration
 		WebElement continueButton = driver.findElement(By.cssSelector("a[class=\"btn btn-primary\"]"));
 		continueButton.click();
@@ -92,7 +97,12 @@ public class RegistartionPurchaseLogout {
 		WebElement addToCartButton = driver.findElement(By.cssSelector("button[onclick=\"cart.add('31', '1');\"]"));
 		addToCartButton.click();
 
-		// Asserting if added to cart successful
+		// Asserting if added to cart successful //
+//		Thread.sleep(2000);
+
+		wait.until(ExpectedConditions
+				.presenceOfAllElementsLocatedBy(By.cssSelector("div.alert.alert-success  a:nth-of-type(1)")));
+
 		WebElement adddedToCartSuccess = driver
 				.findElement(By.cssSelector("div.alert.alert-success  a:nth-of-type(1)"));
 		String adddedToCartSuccessText = adddedToCartSuccess.getText();
@@ -100,11 +110,18 @@ public class RegistartionPurchaseLogout {
 		Assert.assertEquals(adddedToCartSuccessText, "Nikon D300", "Not added to Cart");
 
 		// Clicking check out button in top right corner
+//		wait.until(ExpectedConditions.ti);
+		
 		WebElement checkOutButton = driver
-				.findElement(By.cssSelector("a[title = \"Checkout\"] span[class=\"hidden-xs hidden-sm hidden-md\"]"));
+				.findElement(By.cssSelector("ul.list-inline a[title=\"Checkout\"] i.fa "));
 		checkOutButton.click();
 
+//		a[title = \"Checkout\"] span[class=\"hidden-xs hidden-sm hidden-md\"]
+		
 		// Filling out step 1 of Billing details
+
+		wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("input#input-payment-firstname")));
+
 		driver.findElement(By.cssSelector("input#input-payment-firstname")).sendKeys("FirstName");
 		driver.findElement(By.cssSelector("input#input-payment-lastname")).sendKeys("LastName");
 		driver.findElement(By.cssSelector("input#input-payment-company")).sendKeys("CompanyReloaded");
@@ -120,29 +137,39 @@ public class RegistartionPurchaseLogout {
 
 		WebElement RegionStateList = driver.findElement(By.cssSelector("select#input-payment-zone"));
 		Select RegionState = new Select(RegionStateList);
+
+		wait.until(ExpectedConditions.textToBePresentInElement(RegionStateList, "Dashhowuz Welayaty"));
+
 		RegionState.selectByVisibleText("Dashhowuz Welayaty");
-		RegionState.selectByValue("3399");
+//		RegionState.selectByValue("3399");
 
 		// Continue billing details
 		driver.findElement(By.cssSelector("input#button-payment-address")).click();
 
 		// Continue delivery details
+		wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("input#button-shipping-address")));
 		driver.findElement(By.cssSelector("input#button-shipping-address")).click();
 
 		// Continue delivery method
+		wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("input#button-shipping-method")));
 		driver.findElement(By.cssSelector("input#button-shipping-method")).click();
 
 		// Terms and condition method and continue
+		wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("input[type=\"checkbox\"]")));
 		driver.findElement(By.cssSelector("input[type=\"checkbox\"]")).click();
 		driver.findElement(By.cssSelector("input#button-payment-method")).click();
 
 		// confirm order
+		wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("input#button-confirm")));
 		driver.findElement(By.cssSelector("input#button-confirm")).click();
 
-		Thread.sleep(2000);
-		driver.navigate().refresh();
+//		Thread.sleep(2000);
+//		driver.navigate().refresh();
 
 		///////////// Asserting order confirmations//////
+
+		wait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("div#content h1"),
+				"Your order has been placed!"));
 
 		WebElement orderPlacedMessage = driver.findElement(By.cssSelector("div#content h1"));
 		String confirmationMessage = orderPlacedMessage.getText();
@@ -155,7 +182,7 @@ public class RegistartionPurchaseLogout {
 
 	}
 
-	@Test(priority = 3, dependsOnMethods = { "Registration", "purchasingAndCheckOut" }, enabled = true)
+	@Test(priority = 3, dependsOnMethods = { "Registration", "purchasingAndCheckOut" })
 	public void LogOut() throws InterruptedException {
 
 		// clicking on checkout button than log out
@@ -164,8 +191,13 @@ public class RegistartionPurchaseLogout {
 
 		//// Asserting logout confirmation ///
 
-		Thread.sleep(2000);
-		driver.navigate().refresh();
+//		Thread.sleep(2000);
+//		driver.navigate().refresh();
+
+		WebDriverWait wait = new WebDriverWait(driver, 30);
+
+		wait.until(
+				ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("div#content h1"), "Account Logout"));
 
 		String logOutConfirmation = driver.findElement(By.cssSelector("div#content h1")).getText();
 		Assert.assertEquals(logOutConfirmation, "Account Logout", "You are still logged in");
@@ -178,8 +210,8 @@ public class RegistartionPurchaseLogout {
 	@AfterTest
 	public void teardown() throws InterruptedException {
 
-		Thread.sleep(2000);
-//		driver.close();
+		Thread.sleep(3000);
+		driver.close();
 	}
 
 }
