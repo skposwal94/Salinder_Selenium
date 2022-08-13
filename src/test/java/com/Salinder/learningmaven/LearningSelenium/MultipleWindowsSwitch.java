@@ -1,8 +1,11 @@
 package com.Salinder.learningmaven.LearningSelenium;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.By.ByCssSelector;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -24,6 +27,20 @@ public class MultipleWindowsSwitch {
 
 		driver.manage().window().maximize();
 	}
+	
+	private Boolean switchToWindow(String pageTitle, ArrayList<String> WindowHandles) {
+		for (String s : WindowHandles) {
+			String title;
+			title = driver.switchTo().window(s).getTitle();
+			System.out.println(title);
+			if (title.equals(pageTitle)) {
+				return true;
+				}
+
+		}
+		return false;
+
+	}
 
 	@Test
 	public void Test() throws InterruptedException {
@@ -36,44 +53,37 @@ public class MultipleWindowsSwitch {
 
 		// opening libraries option on left in new tab
 		WebElement loginOption = driver.findElement(By.cssSelector("div.list-group a:nth-of-type(1)"));
-		loginOption.sendKeys(tab);  // using tab string to open in new window
+		loginOption.sendKeys(tab); // using tab string to open in new window
 		Thread.sleep(2000);
 
 		WebElement foregtPasswordOption = driver.findElement(By.cssSelector("div.list-group a:nth-of-type(3)"));
 		foregtPasswordOption.sendKeys(tab); // using tab string to open in new window
-		Thread.sleep(2000); 
+		Thread.sleep(2000);
 
 		String parentWindowID = driver.getWindowHandle();
-		System.out.println(parentWindowID);
 
 		Set<String> allWindowHandles = driver.getWindowHandles();
+		ArrayList<String> allWindowHandlesList = new ArrayList<String>(allWindowHandles);
+		
+		System.out.println(allWindowHandlesList);
 
-	
-		// referring using page title to switch b/w windows open
-		for (String s : allWindowHandles) {
+		switchToWindow("Forgot Your Password?", allWindowHandlesList);
+//		switchToWindow("Account Login", allWindowHandlesList);
+		
+		WebElement element = driver.findElement(By.cssSelector("input[type=\"checkbox\"]"));
 
-			String title;
-			title = driver.switchTo().window(s).getTitle();
-			System.out.println(title);
-			if (title.equals("Forgot Your Password?")) {
-				driver.switchTo().window(s);
-				Thread.sleep(2000);
-			} else if (title.equals("Account Login")) {
-				driver.switchTo().window(s);
-				Thread.sleep(2000);
-			}
-
-		}
-		Thread.sleep(2000);
-		driver.switchTo().window(parentWindowID);
+//		Thread.sleep(2000);
+//		driver.switchTo().window(parentWindowID);
 
 	}
+
+
 
 	@AfterMethod
 	public void teardown() throws InterruptedException {
 
-		Thread.sleep(2000);
-		driver.quit();
+//		Thread.sleep(2000);
+//		driver.quit();
 
 	}
 
